@@ -1,5 +1,3 @@
-import groovy.time.TimeCategory
-
 pipeline {
     agent any
 
@@ -29,8 +27,7 @@ pipeline {
         stage('Create Archive') {
             steps {
                 script {
-                    def formattedDate = new Date().format('yyyyMMddHHmmss')
-                    env.ARCHIVE_NAME = "${APPLICATION_NAME}_${formattedDate}.zip"
+                    env.ARCHIVE_NAME = "${APPLICATION_NAME}_$(date +%Y%m%d%H%M%S).zip"
                 }
                 sh 'zip -r "${ARCHIVE_NAME}" .'
             }
