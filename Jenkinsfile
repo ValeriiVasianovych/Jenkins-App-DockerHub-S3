@@ -33,8 +33,13 @@ pipeline {
 
         stage('Login to Docker Hub') {
             steps {
-                withCredentials([string(credentialsId: DOCKERHUB_CREDENTIALS, variable: 'DOCKERHUB_PASSWORD')]) {
-                    sh "docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}"
+                withCredentials([[
+                    $class: 'UsernamePasswordMultiBinding',
+                    credentialsId: "${DOCKERHUB_CREDENTIALS}",
+                    usernameVariable: 'DOCKERHUB_USERNAME',
+                    passwordVariable: 'DOCKERHUB_PASSWORD'
+                ]]) {
+                    sh 'docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}'
                 }
             }
         }
@@ -51,7 +56,7 @@ pipeline {
                     def formattedDateTime = sh(script: 'date +%Y%m%d%H%M%S', returnStdout: true).trim()
                     env.ARCHIVE_NAME = "${APPLICATION_NAME}_${formattedDateTime}.zip"
                 }
-                sh 'zip -r "${ARCHIVE_NAME}" .'
+                sh "zip -r ${env.ARCHIVE_NAME} ."
             }
         }
 
@@ -63,7 +68,7 @@ pipeline {
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
-                    sh 'aws s3 cp "${ARCHIVE_NAME}" s3://${S3_BUCKET_NAME}/${ARCHIVE_NAME}'
+                    sh "aws s3 cp ${env.ARCHIVE_NAME} s3://${S3_BUCKET_NAME}/${env.ARCHIVE_NAME}"
                 }
             }
         }
