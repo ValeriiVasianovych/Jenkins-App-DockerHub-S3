@@ -1,0 +1,6 @@
+# Ignore this files and directories in Docker build
+README.md
+LICENSE
+Jenkinsfile
+.venv/
+.gitignore
