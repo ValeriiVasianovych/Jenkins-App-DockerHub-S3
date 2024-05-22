@@ -6,10 +6,10 @@ pipeline {
     }
 
     environment {
-        S3_BUCKET_NAME      = 'aws-s3-flask-app-version'
-        APPLICATION_NAME    = 'flask-application'
-        EB_ENVIRONMENT_NAME = 'flask-app-env'
-        REGION              = 'us-east-1'
+        S3_BUCKET_NAME        = 'aws-s3-flask-app-version'
+        APPLICATION_NAME      = 'flask-application'
+        DOCKERHUB_USERNAME    = 'valeriivasianovych'
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
     }
 
     stages {
@@ -22,6 +22,24 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t ${DOCKERHUB_USERNAME}/${APPLICATION_NAME}:latest ."
+            }
+        }
+
+        steps('login') {
+            steps {
+                sh 'docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_CREDENTIALS}'
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh "docker push ${DOCKERHUB_USERNAME}/${APPLICATION_NAME}:latest"
             }
         }
 
@@ -47,36 +65,10 @@ pipeline {
                 }
             }
         }
-
-        // stage('Deploy to Elastic Beanstalk') {
-        //     steps {
-        //         script {
-        //             def buildNumber = sh(script: 'date +%Y%m%d%H%M%S', returnStdout: true).trim()
-        //             env.BUILD_NUMBER = "${APPLICATION_NAME}_${buildNumber}"
-        //         }
-        //         withCredentials([[
-        //             $class: 'AmazonWebServicesCredentialsBinding',
-        //             credentialsId: 'aws-credentials',
-        //             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-        //             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-        //         ]]) {
-        //             sh '''
-        //                 aws elasticbeanstalk create-application-version \
-        //                     --application-name ${APPLICATION_NAME} \
-        //                     --version-label ${BUILD_NUMBER} \
-        //                     --source-bundle S3Bucket=${S3_BUCKET_NAME},S3Key=${ARCHIVE_NAME}
-        //                 aws elasticbeanstalk update-environment \
-        //                     --application-name ${APPLICATION_NAME} \
-        //                     --environment-name ${EB_ENVIRONMENT_NAME} \
-        //                     --version-label ${BUILD_NUMBER}
-        //             '''
-        //         }
-        //     }
-        // }
-
-        stage('Post-build Cleanup') {
-            steps {
+        stage('Post-build Cleanup and Logout') {
+            always {
                 cleanWs()
+                sh 'docker logout'
             }
         }
     }
