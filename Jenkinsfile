@@ -27,7 +27,7 @@ pipeline {
         stage('Create Archive') {
             steps {
                 script {
-                    def formattedDateTime = sh(script: 'date "+%d.%m.%Y %H:%M:%S"', returnStdout: true).trim()
+                    def formattedDateTime = sh(script: 'date "+%d_%m_%Y %H_%M_%S"', returnStdout: true).trim()
                     env.ARCHIVE_NAME = "${APPLICATION_NAME}_${formattedDateTime}.zip"
                 }
                 sh 'zip -r "${ARCHIVE_NAME}" .'
