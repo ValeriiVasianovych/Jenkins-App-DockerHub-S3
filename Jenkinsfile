@@ -35,8 +35,8 @@ pipeline {
         stage('Upload to S3') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    sh 'aws s3 cp ${ARCHIVE_NAME} s3://${S3_BUCKET_NAME}/${ARCHIVE_NAME}'
-                }
+					sh 'aws s3 cp "${ARCHIVE_NAME}" "s3://${S3_BUCKET_NAME}/${ARCHIVE_NAME}"'
+				}
             }
         }
     }
