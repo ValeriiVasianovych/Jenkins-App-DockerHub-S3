@@ -44,7 +44,10 @@ pipeline {
         }
 		stage('Deploy to Elastic Beanstalk') {
 			steps {
-				env.BUILD_NUMBER = sh(script: 'date +%Y%m%d%H%M%S', returnStdout: true).trim()
+				script {
+					def buildNumber = sh(script: 'date +%Y%m%d%H%M%S', returnStdout: true).trim()
+					env.BUILD_NUMBER = "${APPLICATION_NAME}_${buildNumber}"
+				}
 				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
 					sh "aws elasticbeanstalk create-application-version --application-name ${APPLICATION_NAME} --version-label ${BUILD_NUMBER} --source-bundle S3Bucket=${S3_BUCKET_NAME},S3Key=${ARCHIVE_NAME}"
 					sh "aws elasticbeanstalk update-environment --application-name ${APPLICATION_NAME} --environment-name ${EB_ENVIRONMENT_NAME} --version-label ${BUILD_NUMBER}"
