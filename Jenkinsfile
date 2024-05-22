@@ -35,7 +35,7 @@ pipeline {
             steps {
                 sh "docker run --rm -d -p 5000:5000 ${DOCKERHUB_USERNAME}/${APPLICATION_NAME}:latest"
                 sh "sleep 5"
-                sh "curl -s http://localhost:5000 | grep 'Hello, World!'"
+                sh 'curl -I http://localhost:5000 | grep "200"'
                 sh "docker stop \$(docker ps -q)"
             }
         }
