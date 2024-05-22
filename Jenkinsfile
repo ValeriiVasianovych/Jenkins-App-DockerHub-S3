@@ -33,8 +33,8 @@ pipeline {
 		}
 		stage('Upload to S3') {
 			steps {
-				withAWS(region: AWS_REGION, credentials: AWS_CREDENTIALS) {
-					s3Upload(bucket: S3_BUCKET_NAME, path: "${APPLICATION_NAME}.zip")
+				withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+					sh 'aws s3 cp ${APPLICATION_NAME}.zip s3://${S3_BUCKET_NAME}/${APPLICATION_NAME}.zip'
 				}
 			}
 		}
