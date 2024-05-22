@@ -21,14 +21,14 @@ pipeline {
 		stage('Build and Run Flask Application in Docker') {
 			steps {
 				sh 'docker build -t flask-app .'
-				sh 'docker run -d -p 5000:5000 --name $APPLICATION_NAME flask-app'
+				sh 'docker run -d -p 5000:5000 --name ${APPLICATION_NAME} flask-app'
 			}
 		}
 
 		stage('Create Archive') {
 			steps {
 				sh 'sudo apt-get install zip -y'
-				sh 'zip -r ${APPLICATION_NAME}.zip .'
+				sh 'zip -r "${APPLICATION_NAME}.zip" .'
 			}
 		}
 		stage('Upload to S3') {
