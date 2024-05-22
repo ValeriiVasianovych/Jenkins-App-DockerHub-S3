@@ -31,9 +31,11 @@ pipeline {
             }
         }
 
-        steps('login') {
+        stage('Login to Docker Hub') {
             steps {
-                sh 'docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_CREDENTIALS}'
+                withCredentials([string(credentialsId: DOCKERHUB_CREDENTIALS, variable: 'DOCKERHUB_PASSWORD')]) {
+                    sh "docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}"
+                }
             }
         }
 
@@ -65,11 +67,12 @@ pipeline {
                 }
             }
         }
-        stage('Post-build Cleanup and Logout') {
-            always {
-                cleanWs()
-                sh 'docker logout'
-            }
+    }
+
+    post {
+        always {
+            cleanWs()
+            sh 'docker logout'
         }
     }
 }
