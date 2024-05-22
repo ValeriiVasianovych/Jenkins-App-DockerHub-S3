@@ -27,7 +27,6 @@ pipeline {
 
 		stage('Create Archive') {
 			steps {
-				sh 'sudo apt-get install zip -y'
 				sh 'zip -r "${APPLICATION_NAME}.zip" .'
 			}
 		}
