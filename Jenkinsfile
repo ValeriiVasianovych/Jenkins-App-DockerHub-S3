@@ -1,3 +1,5 @@
+import groovy.time.TimeCategory
+
 pipeline {
     agent any
 
@@ -27,7 +29,8 @@ pipeline {
         stage('Create Archive') {
             steps {
                 script {
-                    env.ARCHIVE_NAME = "${APPLICATION_NAME}_\$(date +%Y%m%d%H%M%S).zip"
+                    def formattedDate = new Date().format('yyyyMMddHHmmss')
+                    env.ARCHIVE_NAME = "${APPLICATION_NAME}_${formattedDate}.zip"
                 }
                 sh 'zip -r "${ARCHIVE_NAME}" .'
             }
@@ -35,8 +38,8 @@ pipeline {
         stage('Upload to S3') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-					sh 'aws s3 cp "${ARCHIVE_NAME}" "s3://${S3_BUCKET_NAME}/${ARCHIVE_NAME}"'
-				}
+                    sh "aws s3 cp ${ARCHIVE_NAME} s3://${S3_BUCKET_NAME}/${ARCHIVE_NAME}"
+                }
             }
         }
     }
