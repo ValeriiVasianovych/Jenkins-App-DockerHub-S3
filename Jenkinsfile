@@ -15,7 +15,7 @@ pipeline {
 	stages {
 		stage('Checkout') {
 			steps {
-				checkout scm
+				git branch: 'master', url: 'https://github.com/ValeriiVasianovych/Restful-App-Nodejs.git'
 			}
 		}
 		stage('Build and Run Flask Application in Docker') {
