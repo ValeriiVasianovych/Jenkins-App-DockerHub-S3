@@ -27,7 +27,7 @@ pipeline {
         stage('Create Archive') {
             steps {
                 script {
-                    env.ARCHIVE_NAME = "${APPLICATION_NAME}_$(date +%Y%m%d%H%M%S).zip"
+                    env.ARCHIVE_NAME = "${APPLICATION_NAME}_\$(date +%Y%m%d%H%M%S).zip"
                 }
                 sh 'zip -r "${ARCHIVE_NAME}" .'
             }
