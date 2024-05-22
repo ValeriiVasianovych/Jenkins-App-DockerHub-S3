@@ -31,6 +31,14 @@ pipeline {
             }
         }
 
+        stage('Test Docker Image') {
+            steps {
+                sh "docker run -d -p 5000:5000 ${DOCKERHUB_USERNAME}/${APPLICATION_NAME}:latest"
+                sh "sleep 5"
+                sh "curl -s http://localhost:5000 | grep 'Hello, World!'"
+            }
+        }
+
         stage('Login to Docker Hub') {
             steps {
                 sh 'echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin'
