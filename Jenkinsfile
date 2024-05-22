@@ -15,7 +15,7 @@ pipeline {
 	stages {
 		stage('Checkout') {
 			steps {
-				git 'url'
+				checkout scm
 			}
 		}
 		stage('Build and Run Flask Application in Docker') {
