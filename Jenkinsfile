@@ -33,9 +33,10 @@ pipeline {
 
         stage('Test Docker Image') {
             steps {
-                sh "docker run -d -p 5000:5000 ${DOCKERHUB_USERNAME}/${APPLICATION_NAME}:latest"
+                sh "docker run --rm -d -p 5000:5000 ${DOCKERHUB_USERNAME}/${APPLICATION_NAME}:latest"
                 sh "sleep 5"
                 sh "curl -s http://localhost:5000 | grep 'Hello, World!'"
+                sh "docker stop $(docker ps -q)"
             }
         }
 
