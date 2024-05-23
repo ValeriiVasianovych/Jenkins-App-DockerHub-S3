@@ -27,10 +27,10 @@ pipeline {
 
         stage('Test Docker Image') {
             steps {
+                sh "docker stop \$(docker ps -q)"
                 sh "docker run --rm -d -p 5000:5000 ${DOCKERHUB_USERNAME}/${APPLICATION_NAME}:latest"
                 sh "sleep 5"
                 sh 'if curl -I http://localhost:5000 | grep "200 OK"; then echo "Success"; else exit 1; fi'
-                sh "docker stop \$(docker ps -q)"
             }
         }
 
@@ -72,7 +72,8 @@ pipeline {
 
     post {
         always {
-            sh 'docker logout'
+            sh "docker logout"
+            sh "docker stop \$(docker ps -q)"
         }
     }
 }
