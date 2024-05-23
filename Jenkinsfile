@@ -11,14 +11,7 @@ pipeline {
         DOCKERHUB_USERNAME    = 'valeriivasianovych'
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
     }
-
-    stages {
-        stage('Cleanup Workspace') {
-            steps {
-                cleanWs()
-            }
-        }
-
+    
         stage('Checkout') {
             steps {
                 checkout scm
@@ -78,7 +71,6 @@ pipeline {
 
     post {
         always {
-            cleanWs()
             sh 'docker logout'
         }
     }
